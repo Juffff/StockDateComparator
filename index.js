@@ -13,10 +13,8 @@ const corsOptions = {
     optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
 };
 
-const app = express();
-app.use(bodyParser.json());
-app.use(cors(corsOptions));
-app.get('/grandStock', (req, res) => {
+setInterval(() => {
+    console.log('dildo');
     const stockName = 'GrandStock';
     got(`https://grand-stock.com.ua/ua/katalog-tovarov?limit=100`).then(data => {
 
@@ -90,15 +88,49 @@ app.get('/grandStock', (req, res) => {
                     }]
                 })
             }
-            if(count>0){
+            if (count > 0) {
                 db.listItems({name: stockName}).then(data => db.updateItem(data[0]._id, layoutObjectsArray));
             }
         });
 
-        res.send(layoutObjectsArray);
+        db.findOneItem(stockName)
+            .then(stocks => stocks[0])
+            .then(stock => stock.data)
+            .then(data => {
+                const compareResult = db.detailCompareItems(data[data.length - 1].items, layoutObjectsArray);
+                const added = compareResult.added;
+                const removed = compareResult.removed;
+                if(added.length !== 0 || removed.length !== 0){
+                    db.createDifference({
+                        name: stockName,
+                        data: Date.now(),
+                        added: added,
+                        removed: removed
+                    })
+                }
+
+            });
+        ;
+
 
     });
-
+}, 20000);
+const app = express();
+app.use(bodyParser.json());
+app.use(cors(corsOptions));
+app.get('/grandStock', (req, res) => {
+    db.listDifferents().then(
+        data => {
+            res.send(
+               data.map(el => {
+                 console.log(el.name);
+                   return(
+                       `${el.date} - ${el.name} - ${el.removed} - ${el.added}`
+                   );
+               })
+            );
+        }
+    );
 });
 app.listen(8070, () => {
     console.log(`Server is running on 8070`);
