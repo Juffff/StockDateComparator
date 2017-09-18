@@ -122,12 +122,11 @@ app.get('/grandStock', (req, res) => {
     db.listDifferents().then(
         data => {
             res.send(
-               data.map(el => {
-                 console.log(el.name);
+               JSON.stringify(data.map(el => {
                    return(
                        `${el.date} - ${el.name} - ${el.removed} - ${el.added}`
                    );
-               })
+               }))
             );
         }
     );
