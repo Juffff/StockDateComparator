@@ -1,0 +1,13 @@
+.tableImage{
+    height: 60px;
+    border-radius: 100%;
+}
+
+.table > tbody > tr > td {
+    vertical-align: middle;
+}
+
+.table > thead > tr{
+    background-color: black;
+    color: white;
+}

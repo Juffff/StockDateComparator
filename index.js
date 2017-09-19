@@ -14,7 +14,6 @@ const corsOptions = {
 };
 
 setInterval(() => {
-    console.log('dildo');
     const stockName = 'GrandStock';
     got(`https://grand-stock.com.ua/ua/katalog-tovarov?limit=100`).then(data => {
 
@@ -118,7 +117,7 @@ setInterval(() => {
 const app = express();
 app.use(bodyParser.json());
 app.use(cors(corsOptions));
-app.get('/grandStock', (req, res) => {
+app.get('/', (req, res) => {
     db.listDifferents().then(
         data => {
             res.send(
